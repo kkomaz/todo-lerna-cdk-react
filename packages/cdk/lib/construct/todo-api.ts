@@ -5,7 +5,6 @@ import * as dynamodb from '@aws-cdk/aws-dynamodb';
 import * as iam from '@aws-cdk/aws-iam';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as lambdaNodejs from '@aws-cdk/aws-lambda-nodejs';
-
 interface TodoApiProps {
   todosTable: dynamodb.Table;
 }
@@ -23,6 +22,20 @@ export class TodoApi extends cdk.Construct {
       defaultCorsPreflightOptions: {
         allowMethods: apigateway.Cors.ALL_METHODS,
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
+      },
+    });
+
+    const responseModel = todoApi.addModel('todo-response-model', {
+      contentType: 'application/json',
+      modelName: 'todoResponseModel',
+      schema: {
+        schema: apigateway.JsonSchemaVersion.DRAFT4,
+        title: 'pollResponse',
+        type: apigateway.JsonSchemaType.OBJECT,
+        properties: {
+          state: { type: apigateway.JsonSchemaType.STRING },
+          greeting: { type: apigateway.JsonSchemaType.STRING },
+        },
       },
     });
 
