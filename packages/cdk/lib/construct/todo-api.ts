@@ -40,8 +40,25 @@ export class TodoApi extends cdk.Construct {
       },
     });
 
-    // Allow access to routes and db
+    // Create Todo
+    const createTodo = new lambdaNodejs.NodejsFunction(this, 'CreateTodo', {
+      entry: path.join(__dirname, '../lambda/api/todos/routes/create-todo.ts'),
+      handler: 'handler',
+      runtime: lambda.Runtime.NODEJS_14_X,
+      environment: {
+        TODO_TABLE_NAME: todosTable.tableName,
+      },
+    });
+
+    // 4. Allow read and write data
     todosTable.grantReadData(getTodos);
+    todosTable.grantReadWriteData(createTodo);
+
+    // 5. Add Resources
     todosResource.addMethod('GET', new apigateway.LambdaIntegration(getTodos));
+    todosResource.addMethod(
+      'POST',
+      new apigateway.LambdaIntegration(createTodo)
+    );
   }
 }
