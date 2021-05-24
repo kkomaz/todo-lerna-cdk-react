@@ -52,9 +52,20 @@ export class TodoApi extends cdk.Construct {
       },
     });
 
+    // Delete Todo
+    const deleteTodo = new lambdaNodejs.NodejsFunction(this, 'DeleteTodo', {
+      entry: path.join(__dirname, '../lambda/api/todos/routes/delete-todo.ts'),
+      handler: 'handler',
+      runtime: lambda.Runtime.NODEJS_14_X,
+      environment: {
+        TODO_TABLE_NAME: todosTable.tableName,
+      },
+    });
+
     // 4. Allow read and write data
     todosTable.grantReadData(getTodos);
     todosTable.grantReadWriteData(createTodo);
+    todosTable.grantReadWriteData(deleteTodo);
 
     // 5. Add Resources
     todosResource.addMethod('GET', new apigateway.LambdaIntegration(getTodos));
@@ -67,6 +78,10 @@ export class TodoApi extends cdk.Construct {
           'application/json': postTodoModel(todoApi),
         },
       }
+    );
+    todosResource.addMethod(
+      'DELETE',
+      new apigateway.LambdaIntegration(deleteTodo)
     );
   }
 }

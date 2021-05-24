@@ -7,7 +7,7 @@ export class DbManager extends cdk.Construct {
   constructor(scope: cdk.Construct, id: string) {
     super(scope, id);
 
-    this.todosTable = new dynamodb.Table(this, 'TodosTable', {
+    this.todosTable = new dynamodb.Table(this, 'TodoTable', {
       partitionKey: { name: 'userId', type: dynamodb.AttributeType.STRING },
       sortKey: {
         name: 'todoId',

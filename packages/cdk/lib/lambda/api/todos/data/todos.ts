@@ -8,6 +8,11 @@ export interface Todo {
   todoId: string;
 }
 
+export interface Params {
+  userId: string;
+  todoId: string;
+}
+
 export const getTodosDB = async () => {
   const scanResult = await dynamo
     .scan({
@@ -16,6 +21,15 @@ export const getTodosDB = async () => {
     .promise();
 
   return scanResult;
+};
+
+export const deleteTodoDb = async (params: Params) => {
+  return await dynamo
+    .delete({
+      TableName: tableName,
+      Key: params,
+    })
+    .promise();
 };
 
 export const updateTodoDb = async (todo: Todo) => {
