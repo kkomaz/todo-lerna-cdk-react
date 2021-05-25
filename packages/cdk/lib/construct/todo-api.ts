@@ -62,12 +62,22 @@ export class TodoApi extends cdk.Construct {
       },
     });
 
+    // Update Todo
+    const updateTodo = new lambdaNodejs.NodejsFunction(this, 'UpdateTodo', {
+      entry: path.join(__dirname, '../lambda/api/todos/routes/update-todo.ts'),
+      handler: 'handler',
+      runtime: lambda.Runtime.NODEJS_14_X,
+      environment: {
+        TODO_TABLE_NAME: todosTable.tableName,
+      },
+    });
+
     // 4. Allow read and write data
     todosTable.grantReadData(getTodos);
     todosTable.grantReadWriteData(createTodo);
     todosTable.grantReadWriteData(deleteTodo);
 
-    // 5. Add Resources
+    // 5. Add Resources /todos
     todosResource.addMethod('GET', new apigateway.LambdaIntegration(getTodos));
     todosResource.addMethod(
       'POST',
@@ -83,5 +93,12 @@ export class TodoApi extends cdk.Construct {
       'DELETE',
       new apigateway.LambdaIntegration(deleteTodo)
     );
+
+    // 6. Add Resources /todos/${todoId}
+    const todoResource = todosResource.addResource('{todoId}');
+
+    todoResource.addMethod('PUT', new apigateway.LambdaIntegration(updateTodo));
+
+    todosTable.grantReadWriteData(updateTodo);
   }
 }

@@ -1,6 +1,6 @@
 import * as uuid from 'uuid';
 import { buildResponse } from '../../../../utils/buildResponse';
-import { updateTodoDb } from '../data/todos';
+import { createTodoDb } from '../data/todos';
 
 export const handler = async (event: any) => {
   const userId = uuid.v4(); // Remove later
@@ -19,7 +19,7 @@ export const handler = async (event: any) => {
     completed: false,
   };
   try {
-    await updateTodoDb(todo);
+    await createTodoDb(todo);
     return buildResponse(200, { todo });
   } catch (e) {
     console.error(e);
